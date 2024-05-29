@@ -19,6 +19,7 @@ use App\Http\Controllers\UangKeluarController;
 */
 
 Route::get('/', [LoginController::class, 'index'])->name('login');
+Route::get('/register', [LoginController::class, 'register'])->name('register');
 Route::post('/', [LoginController::class, 'auth'])->name('auth');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 

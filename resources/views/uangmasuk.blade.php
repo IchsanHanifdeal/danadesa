@@ -10,6 +10,7 @@
                 <div class="card-body">
                     <table id="example2" class="table table-bordered table-striped">
                         <thead>
+                            <p>No Rekening : Mandiri <b>(1080026752064 a/n MUHAMMAD QOIRUL RODZ)</b></p>
                             <tr class="text-center">
                                 <th>No</th>
                                 <th>Pukul</th>

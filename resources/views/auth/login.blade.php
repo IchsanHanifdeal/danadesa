@@ -31,7 +31,8 @@
                 <form action="{{ route('auth') }}" method="POST">
                     @csrf
                     <div class="input-group mb-3">
-                        <input type="number" name="nik" class="form-control" placeholder="NIK" value="{{ old('nik')}}">
+                        <input type="number" name="nik" class="form-control" placeholder="NIK"
+                            value="{{ old('nik') }}">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-user"></span>
@@ -52,6 +53,8 @@
                             <!-- /.col -->
                         </div>
                     </div>
+                    <hr>
+                    <p>Belum punya akun?<b><a href="{{ route('register') }}"> Daftar</a></b></p>
                 </form>
                 <!-- /.social-auth-links -->
             </div>

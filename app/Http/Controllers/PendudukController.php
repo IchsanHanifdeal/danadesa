@@ -95,10 +95,11 @@ class PendudukController extends Controller
             DB::commit();
 
             toastr()->success('Daftar Penduduk berhasil!');
-            return redirect()->route('penduduk');
+            return redirect()->back();
         } catch (\Exception $e) {
             DB::rollBack();
-            toastr()->error('An error occurred. Please try again later.');
+            $errorMessage = $e->getMessage();
+            toastr()->error('An error occurred: ' . $errorMessage . '. Please try again later.');
             return redirect()->back();
         }
     }
