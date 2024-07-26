@@ -89,6 +89,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('laporan') }}" class="nav-link {{ $active === 'laporan' ? ' active' : '' }}">
+                                <i class="nav-icon fas fa-archive"></i>
+                                <p>
+                                    Laporan
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <form id="logout-form" action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <a href="#" class="nav-link"

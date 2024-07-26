@@ -22,6 +22,11 @@ Breadcrumbs::for('uang_keluar', function (BreadcrumbTrail $trail) {
     $trail->push('Transaksi Keluar', route('uang_keluar'));
 });
 
+Breadcrumbs::for('laporan', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Laporan', route('laporan'));
+});
+
 Breadcrumbs::for('errors.404', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Error 404 (Not Found)');

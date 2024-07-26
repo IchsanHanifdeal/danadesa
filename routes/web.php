@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\PendudukController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UangMasukController;
@@ -38,3 +39,4 @@ Route::put('/dashboard/uangmasuk/{id_uangmasuk}/tolak', [UangMasukController::cl
 
 Route::get('/dashboard/uangkeluar', [UangKeluarController::class, 'index'])->name('uang_keluar');
 Route::post('/dashboard/uangkeluar', [UangKeluarController::class, 'store'])->name('store_uangkeluar');
+Route::get('/dashboard/laporan', [LaporanController::class, 'index'])->name('laporan');
