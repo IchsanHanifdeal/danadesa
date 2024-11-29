@@ -30,6 +30,7 @@ Route::get('/dashboard/penduduk', [PendudukController::class, 'index'])->name('p
 Route::post('/dashboard/penduduk', [PendudukController::class, 'store'])->name('store_penduduk');
 Route::delete('/dashboard/penduduk/{id_user}', [PendudukController::class, 'destroy'])->name('destroy_penduduk');
 Route::put('/dashboard/penduduk/{id_penduduk}', [PendudukController::class, 'update'])->name('update_penduduk');
+Route::patch('/penduduk/verifikasi/{id}', [PendudukController::class, 'verifikasiPenduduk'])->name('verifikasi.penduduk');
 
 Route::get('/dashboard/uangmasuk', [UangMasukController::class, 'index'])->name('uang_masuk');
 Route::post('/dashboard/uangmasuk/store', [UangMasukController::class, 'store'])->name('store_uangmasuk');

@@ -18,6 +18,7 @@
                                 <th>Jenis Kelamin</th>
                                 <th>Tempat/Tanggal Lahir</th>
                                 <th>Alamat</th>
+                                <th>Veritifikasi</th>
                                 <th>Opsi</th>
                             </tr>
                         </thead>
@@ -44,6 +45,83 @@
                                         <td>{{ $p->tempat_lahir . '/' . $p->tanggal_lahir }}</td>
                                         <td>{{ $p->alamat }}</td>
                                         <td>
+                                            @if ($p->users->veritifikasi == 'menunggu persetujuan')
+                                                <span class="badge badge-warning">Menunggu Persetujuan</span>
+                                            @elseif($p->users->veritifikasi == 'diterima')
+                                                <span class="badge badge-success">Diterima</span>
+                                            @else
+                                                <span class="badge badge-danger">Ditolak</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($p->users->veritifikasi == 'menunggu persetujuan')
+                                                <button type="button" class="btn btn-info" data-toggle="modal"
+                                                    data-target="#modalVeritifikasi-{{ $p->id_user }}">
+                                                    <i class="fas fa-info-circle"></i> Veritifikasi
+                                                </button>
+                                            @endif
+
+                                            <div class="modal fade" id="modalVeritifikasi-{{ $p->id_user }}"
+                                                tabindex="-1" role="dialog"
+                                                aria-labelledby="modalVeritifikasi-{{ $p->id_user }}"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="modalPendudukLabel-{{ $p->id_user }}">Verifikasi
+                                                                Penduduk</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Apakah Anda ingin menerima atau menolak verifikasi untuk
+                                                                penduduk berikut?</p>
+                                                            <ul>
+                                                                <li><strong>NIK:</strong> {{ $p->users->nik }}</li>
+                                                                <li><strong>Nama:</strong>
+                                                                    {{ $p->users->nama_depan . ' ' . $p->users->nama_belakang }}
+                                                                </li>
+                                                                <li><strong>Jenis Kelamin:</strong>
+                                                                    {{ $p->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                                                </li>
+                                                                <li><strong>Tempat/Tanggal Lahir:</strong>
+                                                                    {{ $p->tempat_lahir . '/' . $p->tanggal_lahir }}
+                                                                </li>
+                                                                <li><strong>Alamat:</strong> {{ $p->alamat }}</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <form
+                                                                action="{{ route('verifikasi.penduduk', $p->id_user) }}"
+                                                                method="POST" style="display: inline;">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="veritifikasi"
+                                                                    value="diterima">
+                                                                <button type="submit"
+                                                                    class="btn btn-success">Terima</button>
+                                                            </form>
+                                                            <form
+                                                                action="{{ route('verifikasi.penduduk', $p->id_user) }}"
+                                                                method="POST" style="display: inline;">
+                                                                @csrf
+                                                                @method('PATCH')
+                                                                <input type="hidden" name="veritifikasi"
+                                                                    value="ditolak">
+                                                                <button type="submit"
+                                                                    class="btn btn-danger">Tolak</button>
+                                                            </form>
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-dismiss="modal">Batal</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
                                             <!-- Tombol untuk memicu modal -->
                                             <button type="button" class="btn btn-primary" data-toggle="modal"
                                                 data-target="#modalPenduduk-{{ $p->id_user }}">
@@ -76,20 +154,21 @@
                                                 data-target="#modal-edit-{{ $p->id_penduduk }}"><i
                                                     class="fas fa-edit"></i> Ubah</button>
 
-                                            <div class="modal fade" id="modal-edit-{{ $p->id_penduduk }}" tabindex="-1"
-                                                aria-labelledby="ModalEdit" aria-hidden="true">
+                                            <div class="modal fade" id="modal-edit-{{ $p->id_penduduk }}"
+                                                tabindex="-1" aria-labelledby="ModalEdit" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="exampleModalLabel">Edit
                                                                 {{ $title }}</h5>
-                                                            <button type="button" class="close" data-dismiss="modal"
-                                                                aria-label="Close">
+                                                            <button type="button" class="close"
+                                                                data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">&times;</span>
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="{{ route('update_penduduk', $p->id_penduduk) }}"
+                                                            <form
+                                                                action="{{ route('update_penduduk', $p->id_penduduk) }}"
                                                                 method="POST" enctype="multipart/form-data">
                                                                 @csrf
                                                                 @method('PUT')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\UangMasuk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UangMasukController extends Controller
 {
@@ -12,17 +13,25 @@ class UangMasukController extends Controller
      */
     public function index(Request $request)
     {
-        return view('uangmasuk', [
-            'title' => 'Transaksi Masuk',
-            'active' => 'uang_masuk',
-            'foto_profil' => $request->session()->get('foto_profil'),
-            'id_user' => $request->session()->get('id_user'),
-            'nama_depan' => $request->session()->get('nama_depan'),
-            'role' => $request->session()->get('role'),
-            'nama_belakang' => $request->session()->get('nama_belakang'),
-            'uang_masuk' => UangMasuk::all(),
-        ]);
-    }
+        $uangMasukData = Auth::user()->role === 'admin'
+        ? UangMasuk::all()  
+        : UangMasuk::where(function ($query) {
+            $query->where('id_user', Auth::user()->id_user) 
+                  ->where('sumber', 'penduduk');
+                //   ->orWhere('sumber', 'pemerintah');
+        })->get();
+
+    return view('uangmasuk', [
+        'title' => 'Transaksi Masuk',
+        'active' => 'uang_masuk',
+        'foto_profil' => $request->session()->get('foto_profil'),
+        'id_user' => $request->session()->get('id_user'),
+        'nama_depan' => $request->session()->get('nama_depan'),
+        'role' => $request->session()->get('role'),
+        'nama_belakang' => $request->session()->get('nama_belakang'),
+        'uang_masuk' => $uangMasukData,  // Pass the data to the view
+    ]);
+    }    
 
     /**
      * Show the form for creating a new resource.

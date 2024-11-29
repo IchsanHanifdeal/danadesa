@@ -17,10 +17,11 @@ return new class extends Migration
             $table->string('nik')->unique();
             $table->string('nama_depan');
             $table->string('nama_belakang');
-            $table->string('username')->unique();
+            // $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'user'])->default('user');
+            $table->enum('veritifikasi', ['ditolak', 'diterima', 'menunggu persetujuan'])->default('menunggu persetujuan');
             $table->timestamps();
         });
     }

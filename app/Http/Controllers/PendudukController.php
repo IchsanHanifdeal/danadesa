@@ -29,10 +29,25 @@ class PendudukController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function verifikasiPenduduk(Request $request, $id)
     {
-        //
+        $request->validate([
+            'veritifikasi' => 'required|in:diterima,ditolak',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->veritifikasi = $request->veritifikasi;
+        $user->save();
+
+        if ($request->veritifikasi == 'diterima') {
+            toastr()->success('Penduduk telah diterima!');
+        } else {
+            toastr()->warning('Penduduk telah ditolak!');
+        }
+
+        return redirect()->back();
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -43,15 +58,17 @@ class PendudukController extends Controller
 
         try {
             $request->validate([
-                'foto_profil' => 'file',
-                'nik' => 'required|numeric|unique:users',
+                'foto_profil' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                'nik' => 'required|numeric|digits:16|unique:users,nik',
                 'nama_depan' => 'required|string|max:255',
                 'nama_belakang' => 'required|string|max:255',
-                'jenis_kelamin' => 'required',
-                'tempat_lahir' => 'required',
+                'jenis_kelamin' => 'required|in:L,P',
+                'tempat_lahir' => 'required|string|max:255',
                 'tanggal_lahir' => 'required|date',
-                'alamat' => 'required',
-                'password' => 'required',
+                'alamat' => 'required|string|max:500',
+                // 'username' => 'required|string|max:255|unique:users,username',
+                'email' => 'required|email|max:255|unique:users,email',
+                'password' => 'required|string|min:8|confirmed',
             ]);
 
             $foto_profil_path = null;
@@ -65,21 +82,20 @@ class PendudukController extends Controller
                 'nik' => $request->nik,
                 'nama_depan' => $request->nama_depan,
                 'nama_belakang' => $request->nama_belakang,
-                'username' => $request->username,
+                // 'username' => $request->username,
                 'email' => $request->email,
-                'password' => bcrypt($request->password),
+                'password' => bcrypt($request->password), // Hash password
                 'role' => 'user',
+                'veritifikasi' => 'menunggu persetujuan',
             ]);
 
             if (!$user) {
                 toastr()->error('Gagal mendaftarkan User!');
-                return redirect()->back();
+                return redirect()->back()->withInput();
             }
 
-            $userID = $user->id_user;
-
             $penduduk = Penduduk::create([
-                'id_user' => $userID,
+                'id_user' => $user->id_user,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'tempat_lahir' => $request->tempat_lahir,
                 'tanggal_lahir' => $request->tanggal_lahir,
@@ -89,20 +105,21 @@ class PendudukController extends Controller
             if (!$penduduk) {
                 toastr()->error('Gagal mendaftarkan penduduk!');
                 DB::rollBack();
-                return redirect()->back();
+                return redirect()->back()->withInput();
             }
 
             DB::commit();
 
-            toastr()->success('Daftar Penduduk berhasil!');
-            return redirect()->back();
+            toastr()->success('Pendaftaran berhasil!');
+            return redirect()->route('login'); // Redirect ke halaman login setelah sukses
         } catch (\Exception $e) {
             DB::rollBack();
             $errorMessage = $e->getMessage();
-            toastr()->error('An error occurred: ' . $errorMessage . '. Please try again later.');
-            return redirect()->back();
+            toastr()->error('Terjadi kesalahan: ' . $errorMessage . '. Silakan coba lagi.');
+            return redirect()->back()->withInput();
         }
     }
+
 
 
     /**
@@ -128,7 +145,7 @@ class PendudukController extends Controller
     {
         DB::beginTransaction();
 
-        try { 
+        try {
             $penduduk = Penduduk::where('id_penduduk', $id_penduduk)->firstOrFail();
             $user = User::findOrFail($penduduk->id_user);
 

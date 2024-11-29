@@ -20,10 +20,11 @@ class UserSeeder extends Seeder
             'nik' => '123456789',
             'nama_depan' => 'Muhammad Qoirul',
             'nama_belakang' => 'Rodzikin',
-            'username' => 'Admin',
+            // 'username' => 'Admin',
             'email' => 'muhammadqoirulrodzikin@gmail.com',
             'password' => Hash::make('admin'),
             'role' => 'admin',
+            'veritifikasi' => 'diterima',
         ]);
 
         User::create([
@@ -32,10 +33,11 @@ class UserSeeder extends Seeder
             'nik' => '123123',
             'nama_depan' => 'Muhammad Qoirul',
             'nama_belakang' => 'Rodzikin',
-            'username' => 'penduduk',
+            // 'username' => 'penduduk',
             'email' => 'penduduk@gmail.com',
             'password' => Hash::make('penduduk'),
             'role' => 'user',
+            'veritifikasi' => 'menunggu persetujuan',
         ]);
     }
 }

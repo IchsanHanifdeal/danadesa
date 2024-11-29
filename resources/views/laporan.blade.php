@@ -14,26 +14,27 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Mulai Tanggal</label>
-                                        <input type="date" class="form-control" name="start_date"
-                                            value="{{ $start_date }}" required>
+                                        <label>Pilih Bulan</label>
+                                        <input type="month" class="form-control" name="month" value="{{ $month }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Sampai Tanggal</label>
-                                        <input type="date" class="form-control" name="end_date"
-                                            value="{{ $end_date }}" required>
+                                        <label>Jenis Sumber</label>
+                                        <select class="form-control" name="sumber">
+                                            <option value="">Semua</option>
+                                            <option value="penduduk" {{ $filter_sumber == 'penduduk' ? 'selected' : '' }}>Penduduk</option>
+                                            <option value="pemerintah" {{ $filter_sumber == 'pemerintah' ? 'selected' : '' }}>Pemerintah</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-4 d-flex align-items-end">
                                     <div class="form-group w-100">
-                                        <input type="submit" value="TAMPILKAN"
-                                            class="btn btn-sm btn-primary btn-block">
+                                        <input type="submit" value="TAMPILKAN" class="btn btn-sm btn-primary btn-block">
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </form>                        
                     </div>
                     {{-- Header --}}
                     <div class="row" style="display: none;">
@@ -57,15 +58,13 @@
                     <table id="example2" class="table table-bordered table-striped">
                         <thead>
                             <tr class="text-center">
-                                <th rowspan="2">No</th>
-                                <th rowspan="2">Tanggal</th>
-                                <th rowspan="2">Kategori</th>
-                                <th rowspan="2">Keterangan</th>
-                                <th colspan="2">Jenis</th>
-                            </tr>
-                            <tr>
-                                <th class="text-center">Pemasukan</th>
-                                <th class="text-center">Pengeluaran</th>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Kategori</th>
+                                <th>Keterangan</th>
+                                <th>Pemasukan</th>
+                                <th>Pengeluaran</th>
+                                <th>Dokumentasi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -76,22 +75,47 @@
                                     <td>{{ $item['kategori'] }}</td>
                                     <td>{{ $item['keterangan'] }}</td>
                                     <td class="text-right">
-                                        {{ $item['pemasukan'] ? number_format($item['pemasukan']) : '-' }}
-                                    </td>
+                                        {{ $item['pemasukan'] ? number_format($item['pemasukan']) : '-' }}</td>
                                     <td class="text-right">
-                                        {{ $item['pengeluaran'] ? number_format($item['pengeluaran']) : '-' }}
+                                        {{ $item['pengeluaran'] ? number_format($item['pengeluaran']) : '-' }}</td>
+                                    <td>
+                                        @if ($item['dokumentasi'])
+                                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                                data-target="#modalBukti-{{ $index }}">
+                                                Lihat Dokumentasi
+                                            </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="modalBukti-{{ $index }}" tabindex="-1"
+                                                role="dialog" aria-labelledby="modalPendudukLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="modalPendudukLabel">Dokumentasi
+                                                            </h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <img src="{{ asset('storage/' . $item['dokumentasi']) }}"
+                                                                class="img-fluid" alt="Dokumentasi" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            -
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
-                                @if ($isFiltered)
-                                    <tr class="text-center">
-                                        <td colspan="6">Tidak ada transaksi di tanggal ini</td>
-                                    </tr>
-                                @else
-                                    <tr class="text-center">
-                                        <td colspan="6">Silahkan filter terlebih dahulu</td>
-                                    </tr>
-                                @endif
+                                <tr class="text-center">
+                                    <td colspan="7">
+                                        {{ $isFiltered ? 'Tidak ada transaksi di tanggal ini' : 'Silahkan filter terlebih dahulu' }}
+                                    </td>
+                                </tr>
                             @endforelse
 
                             @if (count($data) > 0)
@@ -99,10 +123,12 @@
                                     <td colspan="4">Total</td>
                                     <td class="text-right">{{ number_format($total_pemasukan) }}</td>
                                     <td class="text-right">{{ number_format($total_pengeluaran) }}</td>
+                                    <td></td>
                                 </tr>
                                 <tr class="text-center font-weight-bold">
                                     <td colspan="4">Saldo</td>
                                     <td colspan="2" class="text-right">{{ number_format($saldo) }}</td>
+                                    <td></td>
                                 </tr>
                             @endif
                         </tbody>

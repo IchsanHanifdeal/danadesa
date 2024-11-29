@@ -13,27 +13,41 @@ class LaporanController extends Controller
      */
     public function index(Request $request)
     {
-        $start_date = $request->input('start_date');
-        $end_date = $request->input('end_date');
+        $month = $request->input('month');
+        $filter_sumber = $request->input('sumber'); // penduduk/pemerintah
 
-        $isFiltered = !empty($start_date) && !empty($end_date);
+        $isFiltered = !empty($month);
 
-        $uang_masuk = UangMasuk::where('validasi', 'diterima')
-            ->whereBetween('created_at', [$start_date, $end_date])
-            ->select('created_at as tanggal', 'keterangan', 'jumlah', 'validasi', 'sumber')
-            ->get();
+        $uang_masuk_query = UangMasuk::where('validasi', 'diterima');
 
-        $uang_keluar = UangKeluar::whereBetween('tanggal', [$start_date, $end_date])
-            ->select('tanggal', 'keterangan', 'jumlah')
-            ->get();
+        if ($isFiltered) {
+            $uang_masuk_query->whereMonth('created_at', '=', date('m', strtotime($month)))
+                ->whereYear('created_at', '=', date('Y', strtotime($month)));
+        }
+
+        if ($filter_sumber) {
+            $uang_masuk_query->where('sumber', $filter_sumber);
+        }
+
+        $uang_masuk = $uang_masuk_query->select('created_at as tanggal', 'keterangan', 'jumlah', 'bukti_transfer', 'sumber')->get();
+
+        $uang_keluar_query = UangKeluar::query();
+
+        if ($isFiltered) {
+            $uang_keluar_query->whereMonth('tanggal', '=', date('m', strtotime($month)))
+                ->whereYear('tanggal', '=', date('Y', strtotime($month)));
+        }
+
+        $uang_keluar = $uang_keluar_query->select('tanggal', 'keterangan', 'jumlah', 'dokumentasi')->get();
 
         $data = $uang_masuk->map(function ($item) {
             return [
                 'tanggal' => $item->tanggal,
-                'kategori' => 'Pemasukan',
+                'kategori' => 'Pemasukan (' . ucfirst($item->sumber) . ')',
                 'keterangan' => $item->keterangan,
                 'pemasukan' => $item->jumlah,
-                'pengeluaran' => null
+                'pengeluaran' => null,
+                'dokumentasi' => $item->bukti_transfer, // Bukti transfer sebagai dokumentasi
             ];
         })->merge($uang_keluar->map(function ($item) {
             return [
@@ -41,7 +55,8 @@ class LaporanController extends Controller
                 'kategori' => 'Pengeluaran',
                 'keterangan' => $item->keterangan,
                 'pemasukan' => null,
-                'pengeluaran' => $item->jumlah
+                'pengeluaran' => $item->jumlah,
+                'dokumentasi' => $item->dokumentasi, // Dokumentasi untuk pengeluaran
             ];
         }));
 
@@ -53,8 +68,7 @@ class LaporanController extends Controller
             'title' => 'Laporan',
             'active' => 'laporan',
             'data' => $data,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
+            'month' => $month,
             'total_pemasukan' => $total_pemasukan,
             'total_pengeluaran' => $total_pengeluaran,
             'saldo' => $saldo,
@@ -62,8 +76,10 @@ class LaporanController extends Controller
             'foto_profil' => $request->session()->get('foto_profil'),
             'nama_depan' => $request->session()->get('nama_depan'),
             'nama_belakang' => $request->session()->get('nama_belakang'),
+            'filter_sumber' => $filter_sumber,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
